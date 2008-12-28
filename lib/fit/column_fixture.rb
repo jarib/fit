@@ -79,13 +79,7 @@ module Fit
           if name.empty?
             @column_bindings << nil
           else
-            suffix = ''
-            if name =~ /\(\)$/
-              suffix = '()'
-              name = name[0...-2]
-            end
-            name = name.split(/([a-zA-Z][^A-Z]+)/).delete_if {|e| e.empty?}.collect {|e| e.downcase}.join('_')
-            name += suffix
+            name = camel name
             adapter = TypeAdapter.for(self, name)
             adapter.type = get_target_class.metadata[name]
             @column_bindings << adapter
@@ -95,6 +89,16 @@ module Fit
         end
         heads = heads.more
       end
+    end
+
+    def camel name
+      suffix = ''
+      if name =~ /\(\)$/
+        suffix = '()'
+        name = name[0...-2]
+      end
+      name = name.split(/([a-zA-Z][^A-Z]+)/).delete_if {|e| e.empty?}.collect {|e| e.strip.downcase}.join('_')
+      name += suffix
     end
 
     def get_target_class; self.class; end
